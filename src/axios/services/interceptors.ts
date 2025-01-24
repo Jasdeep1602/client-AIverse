@@ -3,8 +3,6 @@ import { commonServiceInstance } from '.';
 // - - - authServiceInstance interceptor request - - -
 commonServiceInstance.interceptors.request.use(
   (request) => {
-    // request.baseURL = 'https://server-snapbuy.onrender.com';
-
     // Set custom headers
     request.headers['Content-Type'] = 'application/json';
 
