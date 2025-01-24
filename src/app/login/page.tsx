@@ -20,6 +20,7 @@ import { toast } from 'sonner';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { useRouter } from 'next/navigation';
 import { authLogin } from '@/redux/slices/auth';
+import Link from 'next/link';
 
 export default function Login() {
   const dispatch = useAppDispatch();
@@ -141,6 +142,15 @@ export default function Login() {
               Forgot your password?
             </Button>
           </div>
+          <p className='text-center text-blue-400 p-0 hover:no-underline'>
+            Do not have an account?
+            <Link
+              href='/register'
+              className='whitespace-nowrap font-semibold text-cyan-400 hover:text-cyan-300 p-0 hover:no-underline '>
+              {' '}
+              Register
+            </Link>
+          </p>
           <Button
             onClick={handleLogin}
             className='w-full bg-cyan-400 hover:bg-cyan-300 text-slate-800 font-medium text-lg py-6'>

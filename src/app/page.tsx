@@ -9,8 +9,9 @@ import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
+import { PrivateRoute } from '@/customComponents/PrivateRoute';
 
-export default function Home() {
+function Home() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { isLogoutFetching } = useAppSelector(
@@ -58,3 +59,5 @@ export default function Home() {
     </div>
   );
 }
+
+export default PrivateRoute(Home);
