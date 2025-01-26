@@ -19,7 +19,7 @@ export const commonService = (props: Props) => {
 // - - - authServiceInstance interceptor request - - -
 commonServiceInstance.interceptors.request.use(
   (request) => {
-    request.baseURL = 'https://server-quantum.onrender.com';
+    request.baseURL = 'http://localhost:5000';
 
     // Set custom headers
     request.headers['Content-Type'] = 'application/json';

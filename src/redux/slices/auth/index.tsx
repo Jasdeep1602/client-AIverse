@@ -81,6 +81,52 @@ export const authLogout = createAsyncThunk(
   }
 );
 
+export const authSendVerificationCode = createAsyncThunk(
+  'SendVerificationCode',
+  async (payload: FetchAuthInterface | undefined, thunkAPI) => {
+    const source = axios.CancelToken.source();
+    thunkAPI.signal.addEventListener('abort', () => {
+      source.cancel();
+    });
+    try {
+      const resp = await commonService({
+        method: 'POST',
+        url: 'user/send-verification-code',
+        data: payload?.data,
+        params: payload?.params,
+        cancelToken: source.token,
+      });
+
+      return resp?.data;
+    } catch (error: any) {
+      return thunkAPI?.rejectWithValue(error?.message);
+    }
+  }
+);
+
+export const authVerifyCode = createAsyncThunk(
+  'VerifyCode',
+  async (payload: FetchAuthInterface | undefined, thunkAPI) => {
+    const source = axios.CancelToken.source();
+    thunkAPI.signal.addEventListener('abort', () => {
+      source.cancel();
+    });
+    try {
+      const resp = await commonService({
+        method: 'POST',
+        url: 'user/verify-code',
+        data: payload?.data,
+        params: payload?.params,
+        cancelToken: source.token,
+      });
+
+      return resp?.data;
+    } catch (error: any) {
+      return thunkAPI?.rejectWithValue(error?.message);
+    }
+  }
+);
+
 // export const getUser = createAsyncThunk(
 //   'getUser',
 //   async (payload: FetchAuthInterface | undefined, thunkAPI) => {
@@ -196,6 +242,23 @@ const AuthSlice = createSlice({
     builder.addCase(authLogout.rejected, (init) => {
       const state = init;
       state.isLogoutFetching = false;
+    });
+
+    // - - - -  SendVerificationCode - - - - - - - -
+
+    builder.addCase(authSendVerificationCode.pending, (init) => {
+      const state = init;
+      // state.data = null;
+      state.isRegFetching = true;
+    });
+    builder.addCase(authSendVerificationCode.fulfilled, (init) => {
+      const state = init;
+
+      state.isRegFetching = false;
+    });
+    builder.addCase(authSendVerificationCode.rejected, (init) => {
+      const state = init;
+      state.isRegFetching = false;
     });
   },
 });
