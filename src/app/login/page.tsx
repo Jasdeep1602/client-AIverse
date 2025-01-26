@@ -3,13 +3,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState } from 'react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, User } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import {
   EyeIcon,
   EyeSlashIcon,
@@ -76,12 +76,8 @@ export default function Login() {
     <div className='min-h-screen grid place-items-center bg-gradient-to-b from-teal-600 to-teal-700'>
       <Card className='w-full max-w-sm bg-gradient-to-b from-slate-400 to-slate-700 border-0 shadow-xl pt-16'>
         <CardContent className='space-y-6'>
-          <div className='flex justify-center mb-6'>
-            <Avatar className='h-16 w-16 bg-slate-700/50'>
-              <AvatarFallback>
-                <User className='h-8 w-8 text-slate-400' />
-              </AvatarFallback>
-            </Avatar>
+          <div className='flex justify-center mb-7'>
+            <Image src='/AIverseLogo.png' alt='logo' width='300' height='250' />
           </div>
           <div className='space-y-4'>
             <div className='space-y-2 relative'>
