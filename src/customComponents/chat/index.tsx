@@ -140,7 +140,7 @@ function Chat() {
               <div
                 className={`mx-2 p-3 rounded-lg max-w-[80%] ${
                   message.role === 'user'
-                    ? 'bg-primary text-muted-foreground rounded-md'
+                    ? 'user-message'
                     : 'bg-muted text-muted-foreground rounded-md'
                 }`}>
                 {message.role === 'model' ? (
@@ -215,22 +215,25 @@ function Chat() {
           </div>
         )}
       </div>
-      <div className='p-4 border-t'>
+      <div className='p-4 flex justify-center w-full'>
         <form
           onSubmit={(e) => {
             e.preventDefault();
             handleSend();
           }}
-          className='flex space-x-2'>
+          className='chat'>
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder='Type your message here...'
-            className='flex-1'
+            placeholder='Message AIverse'
+            className='chat-input'
             disabled={isSendingMessage}
           />
-          <Button type='submit' disabled={isSendingMessage || !input.trim()}>
-            <Send className='h-4 w-4' />
+          <Button
+            className=' plane-button hover:bg-transparent'
+            type='submit'
+            disabled={isSendingMessage || !input.trim()}>
+            <Send className=' plane ' />
           </Button>
         </form>
       </div>

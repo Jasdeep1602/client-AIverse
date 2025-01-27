@@ -9,7 +9,9 @@ import Sidebar from '@/customComponents/sidebar';
 function Home() {
   return (
     <div className='flex h-screen'>
-      <Sidebar />
+      <div className='w-80 flex-shrink-0'>
+        <Sidebar />
+      </div>
       <main className='flex-1 overflow-hidden'>
         <Chat />
       </main>

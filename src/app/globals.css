@@ -6,6 +6,38 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.chat {
+  display: flex;
+  width: 600px;
+  gap: 1rem;
+  position: relative;
+}
+
+.chat-input {
+  height: 50px;
+}
+
+.plane {
+  color: #cccece;
+}
+
+.plane-button {
+  background: transparent;
+  position: absolute;
+  right: 0;
+  bottom: 6px;
+}
+
+.plane-button:hover {
+  background: transparent;
+}
+
+.user-message {
+  background: rgba(50, 110, 142, 0.895);
+  border-radius: 8px;
+  color: #c5c7ca;
+}
+
 .react-datepicker {
   background-color: #1e293b;
   color: #f1f5f9;
