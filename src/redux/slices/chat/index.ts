@@ -199,8 +199,9 @@ const ChatSlice = createSlice({
     });
     builder.addCase(sendChatMessage.fulfilled, (state, action) => {
       state.isSendingMessage = false;
+      console.log(action.payload);
       state.currentChatMessages.push(
-        { role: 'user', content: action.payload.userMessage },
+        { role: 'user', content: action.payload.user },
         { role: 'model', content: action.payload.response }
       );
     });

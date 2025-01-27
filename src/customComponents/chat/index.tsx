@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Loader2, Send } from 'lucide-react';
 import Image from 'next/image';
 import {
@@ -71,14 +71,14 @@ function Chat() {
         createChatSession({
           data: { userId: user.id },
         })
-      );
+      ).unwrap();
     } else {
       // Fetch chat history for existing chat
       dispatch(
         fetchChatHistory({
           chatId: currentChatId,
         })
-      );
+      ).unwrap();
     }
   }, [currentChatId, dispatch]);
 
@@ -93,19 +93,19 @@ function Chat() {
           message: input,
         },
       })
-    );
+    ).unwrap();
 
     // Clear input
     setInput('');
   };
 
   return (
-    <div className='flex flex-col h-full'>
+    <div className='flex flex-col h-full bg-background'>
       <div className='p-4 border-t flex justify-between items-center'>
         <Image src='/AIverseLogo.png' alt='logo' width='150' height='100' />
         <Button
           onClick={handleLogout}
-          className=' bg-cyan-400 hover:bg-cyan-300 text-slate-800 font-medium text-lg py-6'>
+          className=' bg-muted hover:bg-cyan-300 font-medium text-sm text-muted-forground py-5'>
           {!isLogoutFetching ? (
             'LOGOUT'
           ) : (
@@ -116,7 +116,7 @@ function Chat() {
           )}
         </Button>{' '}
       </div>
-      <div className='flex-1 overflow-auto p-4 space-y-4'>
+      <div className='flex-1 overflow-auto p-4 space-y-6'>
         {currentChatMessages.map((message: any, index: number) => (
           <div
             key={index}
@@ -124,28 +124,94 @@ function Chat() {
               message.role === 'user' ? 'justify-end' : 'justify-start'
             }`}>
             <div
-              className={`flex items-start ${
+              className={`flex items-start gap-2 ${
                 message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
               }`}>
               <Avatar className='w-8 h-8'>
+                <AvatarImage
+                  src={message.role === 'user' ? '/bear.png' : '/aimg.png'}
+                  alt='image'
+                />
+
                 <AvatarFallback>
                   {message.role === 'user' ? 'U' : 'AI'}
                 </AvatarFallback>
               </Avatar>
               <div
-                className={`mx-2 p-2 rounded-lg ${
+                className={`mx-2 p-3 rounded-lg max-w-[80%] ${
                   message.role === 'user'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200'
+                    ? 'bg-primary text-muted-foreground rounded-md'
+                    : 'bg-muted text-muted-foreground rounded-md'
                 }`}>
-                {message.content}
+                {message.role === 'model' ? (
+                  // Format AI messages with proper spacing and structure
+                  <div className='space-y-4 leading-relaxed'>
+                    {message.content
+                      .split('\n\n')
+                      .map(
+                        (
+                          paragraph: string,
+                          i: React.Key | null | undefined
+                        ) => {
+                          // Handle code blocks
+                          if (paragraph.includes('```')) {
+                            const [before, code, after] =
+                              paragraph.split('```');
+                            return (
+                              <div key={i}>
+                                {before && <p className='mb-2'>{before}</p>}
+                                {code && (
+                                  <pre className='bg-background p-3 rounded-md my-2 overflow-x-auto'>
+                                    <code>{code}</code>
+                                  </pre>
+                                )}
+                                {after && <p className='mt-2'>{after}</p>}
+                              </div>
+                            );
+                          }
+                          // Handle bullet points
+                          else if (paragraph.includes('*')) {
+                            return (
+                              <ul key={i} className='list-disc pl-4 space-y-2'>
+                                {paragraph
+                                  .split('*')
+                                  .map(
+                                    (
+                                      item: string,
+                                      j: React.Key | null | undefined
+                                    ) =>
+                                      item.trim() && (
+                                        <li key={j}>{item.trim()}</li>
+                                      )
+                                  )}
+                              </ul>
+                            );
+                          }
+                          // Regular paragraphs
+                          else {
+                            return (
+                              paragraph.trim() && (
+                                <p key={i} className='text-sm'>
+                                  {paragraph.trim()}
+                                </p>
+                              )
+                            );
+                          }
+                        }
+                      )}
+                  </div>
+                ) : (
+                  // User messages remain simple
+                  <div className='text-sm'>{message.content}</div>
+                )}
               </div>
             </div>
           </div>
         ))}
         {isSendingMessage && (
-          <div className='flex justify-start'>
-            <div className='bg-gray-200 p-2 rounded-lg'>Typing...</div>
+          <div className='flex justify-start items-center gap-1 '>
+            <Loader2 className='animate-spin' />
+            <div className=' text-sm text-blue-700'>AIverse is thinking...</div>
           </div>
         )}
       </div>

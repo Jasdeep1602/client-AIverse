@@ -107,3 +107,13 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .chat-message-user {
+    @apply bg-blue-500 text-white;
+  }
+
+  .chat-message-ai {
+    @apply bg-gray-200 text-gray-900;
+  }
+}
