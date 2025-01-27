@@ -24,6 +24,13 @@ commonServiceInstance.interceptors.request.use(
     // Set custom headers
     request.headers['Content-Type'] = 'application/json';
 
+    // Retrieve the token from localStorage
+    const token = localStorage.getItem('accesstoken');
+
+    // Add the Authorization header if the token exists
+    if (token) {
+      request.headers.Authorization = token;
+    }
     // Include credentials with requests
     request.withCredentials = true;
     return request;

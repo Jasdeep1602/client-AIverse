@@ -2,33 +2,21 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { commonService } from '@/axios/services';
 import axios from 'axios';
+import { ChatState, FetchChatInterface } from './interface';
 
 // Interface for chat-related payloads
-export interface FetchChatInterface {
-  data?: any;
-  params?: any;
-  chatId?: string;
-}
 
 // Interface for chat state
-export interface ChatState {
-  currentChatId: string | null;
-  chatSessions: any[];
-  currentChatMessages: any[];
-  isChatSessionFetching: boolean;
-  isSendingMessage: boolean;
-  error: string | null;
-}
 
 // Initial state
-const initialState: ChatState = {
+const initialState = {
   currentChatId: null,
   chatSessions: [],
   currentChatMessages: [],
   isChatSessionFetching: false,
   isSendingMessage: false,
   error: null,
-};
+} as ChatState;
 
 // Async Thunks for Chat Operations
 export const createChatSession = createAsyncThunk(
