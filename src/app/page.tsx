@@ -1,7 +1,7 @@
 'use client';
 
-import Chat from '@/customComponents/chat';
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import Chat from '@/customComponents/chat';
 
 import { PrivateRoute } from '@/customComponents/PrivateRoute';
 import Sidebar from '@/customComponents/sidebar';
