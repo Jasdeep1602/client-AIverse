@@ -46,6 +46,7 @@ function Sidebar() {
       ).unwrap();
     } catch (error) {
       console.error('Failed to fetch sessions:', error);
+      toast.error('Failed to fetch sessions');
     }
   };
 
@@ -78,7 +79,8 @@ function Sidebar() {
         dispatch(setCurrentChatId(result._id));
       }
     } catch (error) {
-      console.error('Failed to create new chat:', error);
+      console.error(error);
+      toast.error('Failed to create new chat');
     }
   };
 
