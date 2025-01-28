@@ -45,8 +45,9 @@ function Sidebar() {
         })
       ).unwrap();
     } catch (error) {
-      console.error('Failed to fetch sessions:', error);
-      toast.error('Failed to fetch sessions');
+      if (error) {
+        toast.error('Failed to fetch sessions');
+      }
     }
   };
 
@@ -79,8 +80,9 @@ function Sidebar() {
         dispatch(setCurrentChatId(result._id));
       }
     } catch (error) {
-      console.error(error);
-      toast.error('Failed to create new chat');
+      if (error) {
+        toast.error('Failed to create new chat');
+      }
     }
   };
 
@@ -103,7 +105,9 @@ function Sidebar() {
         fetchSessions(user.id);
       }
     } catch (error) {
-      toast.error('Failed to delete chat');
+      if (error) {
+        toast.error('Failed to delete chat');
+      }
     }
   };
 

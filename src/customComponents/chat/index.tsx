@@ -159,7 +159,9 @@ function Chat() {
         dispatch(updateChatTitle({ chatId: currentChatId }));
       }
     } catch (error) {
-      toast.error('Failed to send message');
+      if (error) {
+        toast.error('Failed to send message');
+      }
     }
   };
 
