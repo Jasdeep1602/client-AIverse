@@ -8,7 +8,7 @@ import Sidebar from '@/customComponents/sidebar';
 
 function Home() {
   return (
-    <div className='flex h-screen'>
+    <div className='flex h-screen side-css'>
       <div className='w-80 flex-shrink-0  border-r'>
         <Sidebar />
       </div>

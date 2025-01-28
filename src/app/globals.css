@@ -59,6 +59,14 @@ body {
   color: #c5c7ca;
 }
 
+.delete-dialog {
+  background: #ce1717;
+  font-weight: 600;
+}
+
+.side-css {
+  background: #062335;
+}
 .react-datepicker {
   background-color: #1e293b;
   color: #f1f5f9;

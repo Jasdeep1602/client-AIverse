@@ -109,6 +109,26 @@ export const sendChatMessage = createAsyncThunk(
   }
 );
 
+export const deleteChatSession = createAsyncThunk(
+  'chat/deleteSession',
+  async (payload: FetchChatInterface | undefined, thunkAPI) => {
+    const source = axios.CancelToken.source();
+    thunkAPI.signal.addEventListener('abort', () => {
+      source.cancel();
+    });
+    try {
+      const resp = await commonService({
+        method: 'DELETE',
+        url: `chat/session/${payload?.chatId}`,
+        cancelToken: source.token,
+      });
+      return { chatId: payload?.chatId, ...resp?.data };
+    } catch (error: any) {
+      return thunkAPI?.rejectWithValue(error?.message);
+    }
+  }
+);
+
 export const fetchChatHistory = createAsyncThunk(
   'chat/fetchHistory',
   async (payload: FetchChatInterface | undefined, thunkAPI) => {
@@ -207,6 +227,25 @@ const ChatSlice = createSlice({
     });
     builder.addCase(sendChatMessage.rejected, (state, action) => {
       state.isSendingMessage = false;
+      state.error = action.payload as string;
+    });
+
+    builder.addCase(deleteChatSession.pending, (state) => {
+      state.isChatSessionFetching = true;
+      state.error = null;
+    });
+    builder.addCase(deleteChatSession.fulfilled, (state, action) => {
+      state.isChatSessionFetching = false;
+      state.chatSessions = state.chatSessions.filter(
+        (session) => session._id !== action.payload.chatId
+      );
+      if (state.currentChatId === action.payload.chatId) {
+        state.currentChatId = state.chatSessions[0]?._id || null;
+        state.currentChatMessages = [];
+      }
+    });
+    builder.addCase(deleteChatSession.rejected, (state, action) => {
+      state.isChatSessionFetching = false;
       state.error = action.payload as string;
     });
 
