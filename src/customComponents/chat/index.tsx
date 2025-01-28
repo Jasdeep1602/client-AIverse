@@ -6,12 +6,15 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Loader2, Send } from 'lucide-react';
+import { Loader2, MessageCircle, Send } from 'lucide-react';
 import Image from 'next/image';
 import {
   createChatSession,
   sendChatMessage,
   fetchChatHistory,
+  setCurrentChatId,
+  fetchChatSessions,
+  clearCurrentChatMessages,
 } from '@/redux/slices/chat';
 import { useRouter } from 'next/navigation';
 import { useAppSelector, useAppDispatch } from '@/hooks/redux';
@@ -29,6 +32,9 @@ function Chat() {
   );
   const isSendingMessage = useAppSelector(
     (state) => state.chat.isSendingMessage
+  );
+  const isChatSessionFetching = useAppSelector(
+    (state) => state.chat.isChatSessionFetching
   );
 
   const { isLogoutFetching } = useAppSelector(
@@ -55,32 +61,54 @@ function Chat() {
 
   const [input, setInput] = useState('');
 
-  // Create chat session on mount
+  // First useEffect - Handle initial setup
   useEffect(() => {
-    //     if (!isLogged) {
-    //       router.push('/login');
-    //       return;
-    //     }
-
-    // Get user ID from localStorage
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-    // Dispatch create chat session if no current chat
-    if (!currentChatId) {
-      dispatch(
-        createChatSession({
-          data: { userId: user.id },
-        })
-      ).unwrap();
-    } else {
-      // Fetch chat history for existing chat
+    // First check if there are any existing chat sessions
+    dispatch(
+      fetchChatSessions({
+        data: { userId: user.id },
+      })
+    )
+      .unwrap()
+      .then((sessions) => {
+        if (sessions.length > 0) {
+          // If there are existing sessions but no current chat ID,
+          // set the most recent one as current
+          if (!currentChatId) {
+            dispatch(setCurrentChatId(sessions[0]._id));
+            dispatch(
+              fetchChatHistory({
+                chatId: sessions[0]._id,
+              })
+            ).unwrap();
+          }
+        } else {
+          // Only create a new chat if there are no existing sessions
+          dispatch(
+            createChatSession({
+              data: { userId: user.id },
+            })
+          ).unwrap();
+        }
+      });
+  }, []); // Only run on mount
+
+  // Second useEffect - Handle chat switching
+  useEffect(() => {
+    if (currentChatId) {
+      // Clear current messages before fetching new ones
+      dispatch(clearCurrentChatMessages());
+
+      // Fetch chat history for the selected chat
       dispatch(
         fetchChatHistory({
           chatId: currentChatId,
         })
       ).unwrap();
     }
-  }, [currentChatId, dispatch]);
+  }, [currentChatId, dispatch]); // Run when currentChatId changes
 
   const handleSend = () => {
     if (!input.trim() || !currentChatId) return;
@@ -117,97 +145,115 @@ function Chat() {
         </Button>{' '}
       </div>
       <div className='flex-1 overflow-auto p-4 space-y-6'>
-        {currentChatMessages.map((message: any, index: number) => (
-          <div
-            key={index}
-            className={`flex ${
-              message.role === 'user' ? 'justify-end' : 'justify-start'
-            }`}>
+        {isChatSessionFetching ? (
+          <div className='flex flex-col items-center justify-center h-full space-y-4'>
+            <Loader2 className='w-8 h-8 animate-spin text-blue-500' />
+            <p className='text-sm text-muted-foreground'>
+              Loading chat history...
+            </p>
+          </div>
+        ) : currentChatMessages.length === 0 ? (
+          <div className='flex flex-col items-center justify-center h-full space-y-4'>
+            <MessageCircle className='w-8 h-8 text-muted-foreground' />
+            <p className='text-sm text-muted-foreground'>
+              No messages yet. Start a conversation!
+            </p>
+          </div>
+        ) : (
+          currentChatMessages.map((message: any, index: number) => (
             <div
-              className={`flex items-start gap-2 ${
-                message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
+              key={index}
+              className={`flex ${
+                message.role === 'user' ? 'justify-end' : 'justify-start'
               }`}>
-              <Avatar className='w-8 h-8'>
-                <AvatarImage
-                  src={message.role === 'user' ? '/bear.png' : '/aimg.png'}
-                  alt='image'
-                />
-
-                <AvatarFallback>
-                  {message.role === 'user' ? 'U' : 'AI'}
-                </AvatarFallback>
-              </Avatar>
               <div
-                className={`mx-2 p-3 rounded-lg max-w-[80%] ${
-                  message.role === 'user'
-                    ? 'user-message'
-                    : 'bg-muted text-muted-foreground rounded-md'
+                className={`flex items-start gap-2 ${
+                  message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
                 }`}>
-                {message.role === 'model' ? (
-                  // Format AI messages with proper spacing and structure
-                  <div className='space-y-4 leading-relaxed'>
-                    {message.content
-                      .split('\n\n')
-                      .map(
-                        (
-                          paragraph: string,
-                          i: React.Key | null | undefined
-                        ) => {
-                          // Handle code blocks
-                          if (paragraph.includes('```')) {
-                            const [before, code, after] =
-                              paragraph.split('```');
-                            return (
-                              <div key={i}>
-                                {before && <p className='mb-2'>{before}</p>}
-                                {code && (
-                                  <pre className='bg-background p-3 rounded-md my-2 overflow-x-auto'>
-                                    <code>{code}</code>
-                                  </pre>
-                                )}
-                                {after && <p className='mt-2'>{after}</p>}
-                              </div>
-                            );
-                          }
-                          // Handle bullet points
-                          else if (paragraph.includes('*')) {
-                            return (
-                              <ul key={i} className='list-disc pl-4 space-y-2'>
-                                {paragraph
-                                  .split('*')
-                                  .map(
-                                    (
-                                      item: string,
-                                      j: React.Key | null | undefined
-                                    ) =>
-                                      item.trim() && (
-                                        <li key={j}>{item.trim()}</li>
-                                      )
+                <Avatar className='w-8 h-8'>
+                  <AvatarImage
+                    src={message.role === 'user' ? '/bear.png' : '/aimg.png'}
+                    alt='image'
+                  />
+
+                  <AvatarFallback>
+                    {message.role === 'user' ? 'U' : 'AI'}
+                  </AvatarFallback>
+                </Avatar>
+                <div
+                  className={`mx-2 p-3 rounded-lg max-w-[80%] ${
+                    message.role === 'user'
+                      ? 'user-message'
+                      : 'bg-muted text-muted-foreground rounded-md'
+                  }`}>
+                  {message.role === 'model' ? (
+                    // Format AI messages with proper spacing and structure
+                    <div className='space-y-4 leading-relaxed'>
+                      {message.content
+                        .split('\n\n')
+                        .map(
+                          (
+                            paragraph: string,
+                            i: React.Key | null | undefined
+                          ) => {
+                            // Handle code blocks
+                            if (paragraph.includes('```')) {
+                              const [before, code, after] =
+                                paragraph.split('```');
+                              return (
+                                <div key={i}>
+                                  {before && <p className='mb-2'>{before}</p>}
+                                  {code && (
+                                    <pre className='bg-background p-3 rounded-md my-2 overflow-x-auto'>
+                                      <code>{code}</code>
+                                    </pre>
                                   )}
-                              </ul>
-                            );
+                                  {after && <p className='mt-2'>{after}</p>}
+                                </div>
+                              );
+                            }
+                            // Handle bullet points
+                            else if (paragraph.includes('*')) {
+                              return (
+                                <ul
+                                  key={i}
+                                  className='list-disc pl-4 space-y-2'>
+                                  {paragraph
+                                    .split('*')
+                                    .map(
+                                      (
+                                        item: string,
+                                        j: React.Key | null | undefined
+                                      ) =>
+                                        item.trim() && (
+                                          <li key={j}>{item.trim()}</li>
+                                        )
+                                    )}
+                                </ul>
+                              );
+                            }
+                            // Regular paragraphs
+                            else {
+                              return (
+                                paragraph.trim() && (
+                                  <p key={i} className='text-sm'>
+                                    {paragraph.trim()}
+                                  </p>
+                                )
+                              );
+                            }
                           }
-                          // Regular paragraphs
-                          else {
-                            return (
-                              paragraph.trim() && (
-                                <p key={i} className='text-sm'>
-                                  {paragraph.trim()}
-                                </p>
-                              )
-                            );
-                          }
-                        }
-                      )}
-                  </div>
-                ) : (
-                  // User messages remain simple
-                  <div className='text-sm'>{message.content}</div>
-                )}
+                        )}
+                    </div>
+                  ) : (
+                    // User messages remain simple
+                    <div className='text-sm'>{message.content}</div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
         {isSendingMessage && (
           <div className='flex justify-start items-center gap-1 '>
             <Loader2 className='animate-spin' />
