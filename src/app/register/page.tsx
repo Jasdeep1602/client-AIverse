@@ -108,8 +108,8 @@ function Register() {
   };
 
   return (
-    <div className='min-h-screen grid place-items-center bg-gradient-to-b from-teal-600 to-teal-700'>
-      <Card className='w-full max-w-sm bg-gradient-to-b from-slate-400 to-slate-700 border-0 shadow-xl pt-16'>
+    <div className='min-h-screen grid place-items-center bg-gradient-to-b from-slate-800 to-slate-900'>
+      <Card className='w-full max-w-sm bg-gradient-to-b from-slate-800 to-slate-600 border-0 shadow-xl pt-16'>
         <CardContent className='space-y-6'>
           <div className='flex justify-center mb-7 w-full'>
             <Image src='/AIverseLogo.png' alt='logo' width='300' height='250' />
@@ -216,12 +216,13 @@ function Register() {
 
               <Button
                 onClick={handleSendVerificationCode}
+                variant='login'
                 disabled={
                   !user.email || !user.name || !user.password || !user.dob
                 }
-                className='w-full bg-cyan-400 hover:bg-cyan-300 text-slate-800 font-medium text-lg py-6'>
+                className='w-full font-medium text-sm py-6'>
                 {!isRegFetching ? (
-                  'SEND VERIFICATION CODE'
+                  'SEND VERIFICATION OTP'
                 ) : (
                   <>
                     <Loader2 className='animate-spin mr-2' />
@@ -251,9 +252,10 @@ function Register() {
 
               <Button
                 onClick={handleVerifyCode}
-                className='w-full bg-cyan-400 hover:bg-cyan-300 text-slate-800 font-medium text-lg py-6'>
+                variant='login'
+                className='w-full font-medium text-sm py-6'>
                 {!isRegFetching ? (
-                  'VERIFY CODE'
+                  'VERIFY and LOGIN'
                 ) : (
                   <>
                     <Loader2 className='animate-spin mr-2' />

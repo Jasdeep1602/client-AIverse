@@ -18,6 +18,7 @@ const buttonVariants = cva(
         secondary: 'user-message',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
+        login: ' bg-[#162339] hover:bg-[#03142e] text-[#cccece]',
       },
       size: {
         default: 'h-9 px-4 py-2',

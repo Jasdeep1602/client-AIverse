@@ -164,12 +164,13 @@ function Chat() {
   };
 
   return (
-    <div className='flex flex-col h-full bg-background'>
+    <div className='flex flex-col h-full '>
       <div className='p-4 border-t flex justify-between items-center'>
         <Image src='/AIverseLogo.png' alt='logo' width='150' height='100' />
         <Button
           onClick={handleLogout}
-          className=' bg-muted hover:bg-cyan-300 font-medium text-sm text-muted-forground py-5'>
+          variant='login'
+          className=' font-medium text-sm  py-5'>
           {!isLogoutFetching ? (
             'LOGOUT'
           ) : (
@@ -184,9 +185,6 @@ function Chat() {
         {isChatSessionFetching ? (
           <div className='flex flex-col items-center justify-center h-full space-y-4'>
             <Loader2 className='w-8 h-8 animate-spin text-blue-500' />
-            <p className='text-sm text-muted-foreground'>
-              Loading chat history...
-            </p>
           </div>
         ) : currentChatMessages.length === 0 ? (
           <div className='flex flex-col items-center justify-center h-full space-y-4'>

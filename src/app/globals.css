@@ -64,9 +64,25 @@ body {
   font-weight: 600;
 }
 
-.side-css {
-  background: #062335;
+/* bg-gradient-to-b from-slate-700 to-slate-900 */
+
+.chat-css {
+  background: linear-gradient(to bottom, #2a2b2b, #090e11);
 }
+
+.side-css {
+  background: linear-gradient(to bottom, #143750, #090e11);
+}
+
+.button-bg {
+  background: #162339;
+  color: #cccece;
+}
+
+.button-bg:hover {
+  background: #03142e;
+}
+
 .react-datepicker {
   background-color: #1e293b;
   color: #f1f5f9;
