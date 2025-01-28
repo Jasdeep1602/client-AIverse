@@ -18,6 +18,12 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: 'AIverse',
   description: 'Chatbot',
+  icons: {
+    icon: ['/favicon.ico?v=1'],
+    apple: ['/apple-touch-icon.png?v=4'],
+    shortcut: ['/apple-touch-icon.png'],
+  },
+  manifest: '/site.webmanifest',
 };
 
 export default function RootLayout({
