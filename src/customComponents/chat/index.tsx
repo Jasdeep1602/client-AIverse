@@ -15,6 +15,7 @@ import {
   setCurrentChatId,
   fetchChatSessions,
   clearCurrentChatMessages,
+  updateChatTitle,
 } from '@/redux/slices/chat';
 import { useRouter } from 'next/navigation';
 import { useAppSelector, useAppDispatch } from '@/hooks/redux';
@@ -36,6 +37,8 @@ function Chat() {
   const isChatSessionFetching = useAppSelector(
     (state) => state.chat.isChatSessionFetching
   );
+
+  const chatSessions = useAppSelector((state) => state.chat.chatSessions);
 
   const { isLogoutFetching } = useAppSelector(
     (state: { auth: any }) => state.auth
@@ -65,7 +68,6 @@ function Chat() {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-    // First check if there are any existing chat sessions
     dispatch(
       fetchChatSessions({
         data: { userId: user.id },
@@ -74,8 +76,6 @@ function Chat() {
       .unwrap()
       .then((sessions) => {
         if (sessions.length > 0) {
-          // If there are existing sessions but no current chat ID,
-          // set the most recent one as current
           if (!currentChatId) {
             dispatch(setCurrentChatId(sessions[0]._id));
             dispatch(
@@ -83,9 +83,34 @@ function Chat() {
                 chatId: sessions[0]._id,
               })
             ).unwrap();
+
+            // Update title if it's still "New Chat"
+            if (
+              sessions[0].title === 'New Chat' &&
+              sessions[0].messages?.length >= 2
+            ) {
+              dispatch(updateChatTitle({ chatId: sessions[0]._id }));
+            }
+          } else {
+            dispatch(
+              fetchChatHistory({
+                chatId: currentChatId,
+              })
+            )
+              .unwrap()
+              .then(() => {
+                const currentSession = sessions.find(
+                  (s: { _id: string }) => s._id === currentChatId
+                );
+                if (
+                  currentSession?.title === 'New Chat' &&
+                  currentSession.messages?.length >= 2
+                ) {
+                  dispatch(updateChatTitle({ chatId: currentChatId }));
+                }
+              });
           }
         } else {
-          // Only create a new chat if there are no existing sessions
           dispatch(
             createChatSession({
               data: { userId: user.id },
@@ -110,21 +135,32 @@ function Chat() {
     }
   }, [currentChatId, dispatch]); // Run when currentChatId changes
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim() || !currentChatId) return;
 
-    // Dispatch send message action
-    dispatch(
-      sendChatMessage({
-        data: {
-          chatId: currentChatId,
-          message: input,
-        },
-      })
-    ).unwrap();
+    try {
+      await dispatch(
+        sendChatMessage({
+          data: {
+            chatId: currentChatId,
+            message: input,
+          },
+        })
+      ).unwrap();
 
-    // Clear input
-    setInput('');
+      // Clear input
+      setInput('');
+
+      // Check if we need to update the title
+      const session = chatSessions.find(
+        (s: { _id: string }) => s._id === currentChatId
+      );
+      if (session?.title === 'New Chat') {
+        dispatch(updateChatTitle({ chatId: currentChatId }));
+      }
+    } catch (error) {
+      toast.error('Failed to send message');
+    }
   };
 
   return (

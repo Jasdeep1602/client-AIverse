@@ -16,8 +16,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'Quantum',
-  description: 'Assignment',
+  title: 'AIverse',
+  description: 'Chatbot',
 };
 
 export default function RootLayout({

@@ -124,7 +124,7 @@ function Sidebar() {
                 className='w-full justify-start mr-2'
                 onClick={() => handleSelectChat(session._id)}>
                 <MessageCircle className='mr-2 h-4 w-4' />
-                Chat {session._id.slice(-4)}
+                <span className='truncate'>{session.title}</span>
               </Button>
 
               <AlertDialog>

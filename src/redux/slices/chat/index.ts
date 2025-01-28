@@ -151,6 +151,26 @@ export const fetchChatHistory = createAsyncThunk(
   }
 );
 
+export const updateChatTitle = createAsyncThunk(
+  'chat/updateTitle',
+  async (payload: FetchChatInterface | undefined, thunkAPI) => {
+    const source = axios.CancelToken.source();
+    thunkAPI.signal.addEventListener('abort', () => {
+      source.cancel();
+    });
+    try {
+      const resp = await commonService({
+        method: 'PUT',
+        url: `chat/sessions/${payload?.chatId}/title`,
+        cancelToken: source.token,
+      });
+      return { chatId: payload?.chatId, title: resp?.data?.title };
+    } catch (error: any) {
+      return thunkAPI?.rejectWithValue(error?.message);
+    }
+  }
+);
+
 // Chat Slice
 const ChatSlice = createSlice({
   name: 'chat',
@@ -219,11 +239,20 @@ const ChatSlice = createSlice({
     });
     builder.addCase(sendChatMessage.fulfilled, (state, action) => {
       state.isSendingMessage = false;
-      console.log(action.payload);
       state.currentChatMessages.push(
         { role: 'user', content: action.payload.user },
         { role: 'model', content: action.payload.response }
       );
+
+      // Update the chat title in the sessions list
+      if (action.payload.title) {
+        const chatSession = state.chatSessions.find(
+          (session) => session._id === state.currentChatId
+        );
+        if (chatSession) {
+          chatSession.title = action.payload.title;
+        }
+      }
     });
     builder.addCase(sendChatMessage.rejected, (state, action) => {
       state.isSendingMessage = false;
@@ -260,6 +289,22 @@ const ChatSlice = createSlice({
     });
     builder.addCase(fetchChatHistory.rejected, (state, action) => {
       state.isChatSessionFetching = false;
+      state.error = action.payload as string;
+    });
+
+    builder.addCase(updateChatTitle.pending, (state) => {
+      // Optionally add loading state if needed
+      state.error = null;
+    });
+    builder.addCase(updateChatTitle.fulfilled, (state, action) => {
+      const chatSession = state.chatSessions.find(
+        (session) => session._id === action.payload.chatId
+      );
+      if (chatSession) {
+        chatSession.title = action.payload.title;
+      }
+    });
+    builder.addCase(updateChatTitle.rejected, (state, action) => {
       state.error = action.payload as string;
     });
   },
