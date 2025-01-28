@@ -76,7 +76,7 @@ export default function Login() {
     <div className='min-h-screen grid place-items-center bg-gradient-to-b from-teal-600 to-teal-700'>
       <Card className='w-full max-w-sm bg-gradient-to-b from-slate-400 to-slate-700 border-0 shadow-xl pt-16'>
         <CardContent className='space-y-6'>
-          <div className='flex justify-center mb-7'>
+          <div className='flex justify-center mb-10'>
             <Image src='/AIverseLogo.png' alt='logo' width='300' height='250' />
           </div>
           <div className='space-y-4'>
@@ -120,24 +120,7 @@ export default function Login() {
               </button>
             </div>
           </div>
-          <div className='flex items-center justify-between text-sm '>
-            <div className='flex items-center space-x-2'>
-              <Checkbox
-                id='remember'
-                className='border-cyan-400 data-[state=checked]:bg-cyan-400 data-[state=checked]:border-cyan-400'
-              />
-              <Label
-                htmlFor='remember'
-                className='text-cyan-400 hover:text-cyan-300 p-0'>
-                Remember me
-              </Label>
-            </div>
-            <Button
-              variant='link'
-              className='text-cyan-400 hover:text-cyan-300 p-0 hover:no-underline'>
-              Forgot your password?
-            </Button>
-          </div>
+
           <p className='text-center text-blue-400 p-0 hover:no-underline'>
             Do not have an account?
             <Link
